@@ -7,17 +7,21 @@ const HARDCOVERAPI_KEY = process.env.HARDCOVERAPI_KEY || '';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET' || req.method === 'POST') {
-    const transport = new SSEServerTransport('/api/mcp', res);
-    const server = new McpServer();
+    // SSEServerTransport takes req, res arguments
+    const transport = new SSEServerTransport(req, res);
+    const server = new McpServer({
+      serverName: 'Hardcover MCP',
+      serverVersion: '1.0.0'
+    });
     
     // Create client
     const client = new HardcoverClient(HARDCOVERAPI_KEY);
     
-    // Register search books tool
-    server.registerTool({
-      name: 'search_books',
-      description: 'Search for books by title, author, or ISBN',
-      parameters: {
+    // Register search books tool - fix arguments
+    server.registerTool(
+      'search_books',
+      'Search for books by title, author, or ISBN',
+      {
         type: 'object',
         properties: {
           query: {
@@ -32,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         },
         required: ['query'],
       },
-      execute: async ({ query, limit = 10 }) => {
+      async ({ query, limit = 10 }: { query: string; limit?: number }) => {
         try {
           const books = await client.searchBooks(query, limit);
           return books;
@@ -40,14 +44,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           console.error('Error searching books:', error);
           return { error: `Failed to search books: ${error instanceof Error ? error.message : String(error)}` };
         }
-      },
-    });
+      }
+    );
     
     // Register get book details tool
-    server.registerTool({
-      name: 'get_book_details',
-      description: 'Get detailed information about a specific book by ID',
-      parameters: {
+    server.registerTool(
+      'get_book_details',
+      'Get detailed information about a specific book by ID',
+      {
         type: 'object',
         properties: {
           book_id: {
@@ -57,7 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         },
         required: ['book_id'],
       },
-      execute: async ({ book_id }) => {
+      async ({ book_id }: { book_id: number }) => {
         try {
           const book = await client.getBookDetails(book_id);
           return book;
@@ -65,14 +69,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           console.error('Error getting book details:', error);
           return { error: `Failed to get book details: ${error instanceof Error ? error.message : String(error)}` };
         }
-      },
-    });
+      }
+    );
     
     // Register get user library tool
-    server.registerTool({
-      name: 'get_user_library',
-      description: 'Get a list of books in the user\'s library',
-      parameters: {
+    server.registerTool(
+      'get_user_library',
+      'Get a list of books in the user\'s library',
+      {
         type: 'object',
         properties: {
           user_id: {
@@ -81,7 +85,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
         },
       },
-      execute: async ({ user_id }) => {
+      async ({ user_id }: { user_id?: number }) => {
         try {
           const books = await client.getUserLibrary(user_id);
           return books;
@@ -89,11 +93,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           console.error('Error getting user library:', error);
           return { error: `Failed to get user library: ${error instanceof Error ? error.message : String(error)}` };
         }
-      },
-    });
+      }
+    );
     
     await server.connect(transport);
-    transport.handleRequest(req);
+    
+    // SSE transport doesn't use handleRequest, the transport is already handling the request
+    // Just return to keep the connection open
+    return;
   } else {
     res.status(405).json({ error: 'Method not allowed' });
   }
