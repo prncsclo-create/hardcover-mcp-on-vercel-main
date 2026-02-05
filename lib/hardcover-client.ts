@@ -38,7 +38,10 @@ export class HardcoverClient {
       return response.books || [];
     } catch (error) {
       console.error('Error searching books:', error);
-      throw new Error(`Failed to search books: ${error instanceof Error ? error.message : String(error)}`);
+      if (error instanceof Error) {
+        throw new Error(`Failed to search books: ${error.message}`);
+      }
+      throw new Error(`Failed to search books: ${String(error)}`);
     }
   }
 
@@ -51,10 +54,13 @@ export class HardcoverClient {
         variables
       );
 
-      return response.booksbypk || null;
+      return response.books_by_pk || null;
     } catch (error) {
       console.error('Error getting book details:', error);
-      throw new Error(`Failed to get book details: ${error instanceof Error ? error.message : String(error)}`);
+      if (error instanceof Error) {
+        throw new Error(`Failed to get book details: ${error.message}`);
+      }
+      throw new Error(`Failed to get book details: ${String(error)}`);
     }
   }
 
@@ -73,7 +79,10 @@ export class HardcoverClient {
       return response.user_books || [];
     } catch (error) {
       console.error('Error getting user library:', error);
-      throw new Error(`Failed to get user library: ${error instanceof Error ? error.message : String(error)}`);
+      if (error instanceof Error) {
+        throw new Error(`Failed to get user library: ${error.message}`);
+      }
+      throw new Error(`Failed to get user library: ${String(error)}`);
     }
   }
 }
