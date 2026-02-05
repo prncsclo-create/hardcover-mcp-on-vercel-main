@@ -46,10 +46,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('API Key length:', HARDCOVERAPI_KEY ? HARDCOVERAPI_KEY.length : 0);
       
       console.log('Registering search_books tool');
-      server.registerTool({
-        name: 'search_books',
-        description: 'Search for books by title, author, or ISBN',
-        parameters: {
+      server.registerTool(
+        'search_books',
+        'Search for books by title, author, or ISBN',
+        {
           type: 'object',
           properties: {
             query: {
@@ -64,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
           required: ['query'],
         },
-        execute: async ({ query, limit = 10 }: { query: string; limit?: number }) => {
+        async ({ query, limit = 10 }: { query: string; limit?: number }) => {
           console.log('Executing search_books', { query, limit });
           try {
             const books = await client.searchBooks(query, limit);
@@ -75,13 +75,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return { error: `Failed to search books: ${error instanceof Error ? error.message : String(error)}` };
           }
         }
-      });
+      );
       
       console.log('Registering get_book_details tool');
-      server.registerTool({
-        name: 'get_book_details',
-        description: 'Get detailed information about a specific book by ID',
-        parameters: {
+      server.registerTool(
+        'get_book_details',
+        'Get detailed information about a specific book by ID',
+        {
           type: 'object',
           properties: {
             book_id: {
@@ -91,7 +91,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
           required: ['book_id'],
         },
-        execute: async ({ book_id }: { book_id: number }) => {
+        async ({ book_id }: { book_id: number }) => {
           console.log('Executing get_book_details', { book_id });
           try {
             const book = await client.getBookDetails(book_id);
@@ -102,13 +102,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return { error: `Failed to get book details: ${error instanceof Error ? error.message : String(error)}` };
           }
         }
-      });
+      );
       
       console.log('Registering get_user_library tool');
-      server.registerTool({
-        name: 'get_user_library',
-        description: 'Get a list of books in the user\'s library',
-        parameters: {
+      server.registerTool(
+        'get_user_library',
+        'Get a list of books in the user\'s library',
+        {
           type: 'object',
           properties: {
             user_id: {
@@ -117,7 +117,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             },
           },
         },
-        execute: async ({ user_id }: { user_id?: number }) => {
+        async ({ user_id }: { user_id?: number }) => {
           console.log('Executing get_user_library', { user_id });
           try {
             const books = await client.getUserLibrary(user_id);
@@ -128,7 +128,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return { error: `Failed to get user library: ${error instanceof Error ? error.message : String(error)}` };
           }
         }
-      });
+      );
       
       console.log('Connecting server to transport');
       await server.connect(transport);
