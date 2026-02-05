@@ -5,7 +5,7 @@ title: string;
 description?: string;
 release_date?: string;
 rating?: number;
-usersreadcount?: number;
+users_read_count?: number;
 pages?: number;
 language?: string;
 isbn_10?: string;
@@ -65,7 +65,7 @@ books: HardcoverBook[];
 }
 
 export interface GetBookResponse {
-booksbypk: HardcoverBook;
+books_by_pk: HardcoverBook;
 }
 
 export interface UserLibraryResponse {
