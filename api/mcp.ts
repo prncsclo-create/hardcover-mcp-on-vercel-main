@@ -18,21 +18,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method === 'GET' || req.method === 'POST') {
-    // SSEServerTransport takes req, res arguments
-    const transport = new SSEServerTransport(req, res);
+    // SSEServerTransport takes path and response arguments
+    const transport = new SSEServerTransport('/api/mcp', res);
     const server = new McpServer({
-      serverName: 'Hardcover MCP',
-      serverVersion: '1.0.0'
+      name: 'Hardcover MCP',
+      version: '1.0.0'
     });
     
     // Create client
     const client = new HardcoverClient(HARDCOVERAPI_KEY);
     
-    // Register search books tool - fix arguments
-    server.registerTool(
-      'search_books',
-      'Search for books by title, author, or ISBN',
-      {
+    // Register search books tool
+    server.registerTool({
+      name: 'search_books',
+      description: 'Search for books by title, author, or ISBN',
+      parameters: {
         type: 'object',
         properties: {
           query: {
@@ -47,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         },
         required: ['query'],
       },
-      async ({ query, limit = 10 }: { query: string; limit?: number }) => {
+      execute: async ({ query, limit = 10 }: { query: string; limit?: number }) => {
         try {
           const books = await client.searchBooks(query, limit);
           return books;
@@ -56,13 +56,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return { error: `Failed to search books: ${error instanceof Error ? error.message : String(error)}` };
         }
       }
-    );
+    });
     
     // Register get book details tool
-    server.registerTool(
-      'get_book_details',
-      'Get detailed information about a specific book by ID',
-      {
+    server.registerTool({
+      name: 'get_book_details',
+      description: 'Get detailed information about a specific book by ID',
+      parameters: {
         type: 'object',
         properties: {
           book_id: {
@@ -72,7 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         },
         required: ['book_id'],
       },
-      async ({ book_id }: { book_id: number }) => {
+      execute: async ({ book_id }: { book_id: number }) => {
         try {
           const book = await client.getBookDetails(book_id);
           return book;
@@ -81,13 +81,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return { error: `Failed to get book details: ${error instanceof Error ? error.message : String(error)}` };
         }
       }
-    );
+    });
     
     // Register get user library tool
-    server.registerTool(
-      'get_user_library',
-      'Get a list of books in the user\'s library',
-      {
+    server.registerTool({
+      name: 'get_user_library',
+      description: 'Get a list of books in the user\'s library',
+      parameters: {
         type: 'object',
         properties: {
           user_id: {
@@ -96,7 +96,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
         },
       },
-      async ({ user_id }: { user_id?: number }) => {
+      execute: async ({ user_id }: { user_id?: number }) => {
         try {
           const books = await client.getUserLibrary(user_id);
           return books;
@@ -105,7 +105,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return { error: `Failed to get user library: ${error instanceof Error ? error.message : String(error)}` };
         }
       }
-    );
+    });
     
     await server.connect(transport);
     
