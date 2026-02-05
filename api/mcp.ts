@@ -50,29 +50,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'search_books',
         'Search for books by title, author, or ISBN',
         {
-          type: 'object',
-          properties: {
-            query: {
-              type: 'string',
-              description: 'Search query (title, author, or ISBN)',
+          parameters: {
+            type: 'object',
+            properties: {
+              query: {
+                type: 'string',
+                description: 'Search query (title, author, or ISBN)',
+              },
+              limit: {
+                type: 'number',
+                description: 'Maximum number of results to return',
+                default: 10,
+              },
             },
-            limit: {
-              type: 'number',
-              description: 'Maximum number of results to return',
-              default: 10,
-            },
+            required: ['query'],
           },
-          required: ['query'],
-        },
-        async ({ query, limit = 10 }: { query: string; limit?: number }) => {
-          console.log('Executing search_books', { query, limit });
-          try {
-            const books = await client.searchBooks(query, limit);
-            console.log('Search results', { count: books.length });
-            return books;
-          } catch (error) {
-            console.error('Error searching books:', error);
-            return { error: `Failed to search books: ${error instanceof Error ? error.message : String(error)}` };
+          execute: async ({ query, limit = 10 }: { query: string; limit?: number }) => {
+            console.log('Executing search_books', { query, limit });
+            try {
+              const books = await client.searchBooks(query, limit);
+              console.log('Search results', { count: books.length });
+              return books;
+            } catch (error) {
+              console.error('Error searching books:', error);
+              return { error: `Failed to search books: ${error instanceof Error ? error.message : String(error)}` };
+            }
           }
         }
       );
@@ -82,24 +84,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'get_book_details',
         'Get detailed information about a specific book by ID',
         {
-          type: 'object',
-          properties: {
-            book_id: {
-              type: 'number',
-              description: 'Hardcover book ID',
+          parameters: {
+            type: 'object',
+            properties: {
+              book_id: {
+                type: 'number',
+                description: 'Hardcover book ID',
+              },
             },
+            required: ['book_id'],
           },
-          required: ['book_id'],
-        },
-        async ({ book_id }: { book_id: number }) => {
-          console.log('Executing get_book_details', { book_id });
-          try {
-            const book = await client.getBookDetails(book_id);
-            console.log('Book details retrieved');
-            return book;
-          } catch (error) {
-            console.error('Error getting book details:', error);
-            return { error: `Failed to get book details: ${error instanceof Error ? error.message : String(error)}` };
+          execute: async ({ book_id }: { book_id: number }) => {
+            console.log('Executing get_book_details', { book_id });
+            try {
+              const book = await client.getBookDetails(book_id);
+              console.log('Book details retrieved');
+              return book;
+            } catch (error) {
+              console.error('Error getting book details:', error);
+              return { error: `Failed to get book details: ${error instanceof Error ? error.message : String(error)}` };
+            }
           }
         }
       );
@@ -109,23 +113,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'get_user_library',
         'Get a list of books in the user\'s library',
         {
-          type: 'object',
-          properties: {
-            user_id: {
-              type: 'number',
-              description: 'Hardcover user ID (optional)',
+          parameters: {
+            type: 'object',
+            properties: {
+              user_id: {
+                type: 'number',
+                description: 'Hardcover user ID (optional)',
+              },
             },
           },
-        },
-        async ({ user_id }: { user_id?: number }) => {
-          console.log('Executing get_user_library', { user_id });
-          try {
-            const books = await client.getUserLibrary(user_id);
-            console.log('User library retrieved', { count: books.length });
-            return books;
-          } catch (error) {
-            console.error('Error getting user library:', error);
-            return { error: `Failed to get user library: ${error instanceof Error ? error.message : String(error)}` };
+          execute: async ({ user_id }: { user_id?: number }) => {
+            console.log('Executing get_user_library', { user_id });
+            try {
+              const books = await client.getUserLibrary(user_id);
+              console.log('User library retrieved', { count: books.length });
+              return books;
+            } catch (error) {
+              console.error('Error getting user library:', error);
+              return { error: `Failed to get user library: ${error instanceof Error ? error.message : String(error)}` };
+            }
           }
         }
       );
