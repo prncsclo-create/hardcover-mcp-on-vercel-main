@@ -1,4 +1,3 @@
-```typescript
 export interface HardcoverBook {
 id: number;
 title: string;
@@ -92,4 +91,3 @@ status: string;
 rating?: number;
 progress?: number;
 }
-```
