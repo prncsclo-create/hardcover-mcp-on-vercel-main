@@ -57,16 +57,32 @@ server.registerTool(
     description: 'Search for books on Hardcover by title or author',
     inputSchema: searchBooksSchema,
   },
-  async ({ query, limit }): Promise<CallToolResult> => {
-    const books = await hardcoverClient.searchBooks(query, limit);
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(books, null, 2),
-        },
-      ],
-    };
+  async (extra) => {
+    const { query, limit = 10 } = extra.parameters as { query: string; limit?: number };
+    console.log('Executing search_books', { query, limit });
+    try {
+      const books = await hardcoverClient.searchBooks(query, limit);
+      console.log('Search results', { count: books?.length || 0 });
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(books, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      console.error('Error searching books:', error);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Failed to search books: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+        isError: true,
+      };
+    }
   }
 );
 
@@ -77,27 +93,43 @@ server.registerTool(
     description: 'Get detailed information about a specific book',
     inputSchema: getBookDetailsSchema,
   },
-  async ({ id }): Promise<CallToolResult> => {
-    const book = await hardcoverClient.getBookDetails(id);
-    if (!book) {
+  async (extra) => {
+    const { id } = extra.parameters as { id: number };
+    console.log('Executing get_book_details', { id });
+    try {
+      const book = await hardcoverClient.getBookDetails(id);
+      if (!book) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Book with ID ${id} not found`,
+            },
+          ],
+          isError: true,
+        };
+      }
+      console.log('Book details retrieved', { bookId: id });
       return {
         content: [
           {
             type: 'text',
-            text: `Book with ID ${id} not found`,
+            text: JSON.stringify(book, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      console.error('Error getting book details:', error);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Failed to get book details: ${error instanceof Error ? error.message : String(error)}`,
           },
         ],
         isError: true,
       };
     }
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(book, null, 2),
-        },
-      ],
-    };
   }
 );
 
@@ -107,16 +139,31 @@ server.registerTool(
   {
     description: 'Get the current user\'s reading library',
   },
-  async (): Promise<CallToolResult> => {
-    const library = await hardcoverClient.getUserLibrary();
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(library, null, 2),
-        },
-      ],
-    };
+  async (extra) => {
+    console.log('Executing get_user_library');
+    try {
+      const library = await hardcoverClient.getUserLibrary();
+      console.log('User library retrieved', { count: library?.length || 0 });
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(library, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      console.error('Error getting user library:', error);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Failed to get user library: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+        isError: true,
+      };
+    }
   }
 );
 
@@ -127,15 +174,30 @@ server.registerTool(
     description: 'Add a book to the user\'s library with a specific status',
     inputSchema: addToLibrarySchema,
   },
-  async ({ bookId, status }): Promise<CallToolResult> => {
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Added book ${bookId} to library with status: ${status}`,
-        },
-      ],
-    };
+  async (extra) => {
+    const { bookId, status } = extra.parameters as { bookId: number; status: string };
+    console.log('Executing add_to_library', { bookId, status });
+    try {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Added book ${bookId} to library with status: ${status}`,
+          },
+        ],
+      };
+    } catch (error) {
+      console.error('Error adding to library:', error);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Failed to add to library: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+        isError: true,
+      };
+    }
   }
 );
 
@@ -146,15 +208,35 @@ server.registerTool(
     description: 'Update the reading status, rating, or progress of a book in the library',
     inputSchema: updateStatusSchema,
   },
-  async ({ id, status, rating, progress }): Promise<CallToolResult> => {
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Updated book ${id} - Status: ${status}, Rating: ${rating || 'N/A'}, Progress: ${progress || 'N/A'}%`,
-        },
-      ],
+  async (extra) => {
+    const { id, status, rating, progress } = extra.parameters as { 
+      id: number; 
+      status: string; 
+      rating?: number; 
+      progress?: number 
     };
+    console.log('Executing update_reading_status', { id, status, rating, progress });
+    try {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Updated book ${id} - Status: ${status}, Rating: ${rating || 'N/A'}, Progress: ${progress || 'N/A'}%`,
+          },
+        ],
+      };
+    } catch (error) {
+      console.error('Error updating reading status:', error);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Failed to update reading status: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+        isError: true,
+      };
+    }
   }
 );
 
