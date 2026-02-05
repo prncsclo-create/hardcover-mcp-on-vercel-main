@@ -3,6 +3,9 @@
   "functions": {
     "api/server.ts": {
       "maxDuration": 60
+    },
+    "api/mcp.ts": {
+      "maxDuration": 60
     }
   },
   "installCommand": "npm install"
