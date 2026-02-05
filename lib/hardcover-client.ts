@@ -3,13 +3,13 @@ import {
   SEARCH_BOOKS_QUERY,
   GET_BOOK_DETAILS_QUERY,
   GET_USER_LIBRARY_QUERY
-} from './queries';
+} from './queries.js';
 import {
   HardcoverBook,
   SearchBooksResponse,
   GetBookResponse,
   UserLibraryResponse
-} from './types';
+} from './types.js';
 
 export class HardcoverClient {
   private client: GraphQLClient;
@@ -38,7 +38,7 @@ export class HardcoverClient {
       return response.books || [];
     } catch (error) {
       console.error('Error searching books:', error);
-      throw new Error(`Failed to search books: ${error.message}`);
+      throw new Error(`Failed to search books: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -51,16 +51,19 @@ export class HardcoverClient {
         variables
       );
 
-      return response.books_by_pk || null;
+      return response.booksbypk || null;
     } catch (error) {
       console.error('Error getting book details:', error);
-      throw new Error(`Failed to get book details: ${error.message}`);
+      throw new Error(`Failed to get book details: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
   async getUserLibrary(userId?: number): Promise<any[]> {
     try {
-      const variables = userId ? { userId } : {};
+      const variables: any = {};
+      if (userId !== undefined) {
+        variables.userId = userId;
+      }
 
       const response: UserLibraryResponse = await this.client.request(
         GET_USER_LIBRARY_QUERY,
@@ -70,7 +73,7 @@ export class HardcoverClient {
       return response.user_books || [];
     } catch (error) {
       console.error('Error getting user library:', error);
-      throw new Error(`Failed to get user library: ${error.message}`);
+      throw new Error(`Failed to get user library: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 }
