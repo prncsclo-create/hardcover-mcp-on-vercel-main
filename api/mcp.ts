@@ -48,7 +48,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('Registering search_books tool');
       server.registerTool(
         'search_books',
-        'Search for books by title, author, or ISBN',
+        {
+          title: 'Search Books',
+          description: 'Search for books by title, author, or ISBN'
+        },
         {
           parameters: {
             type: 'object',
@@ -82,7 +85,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('Registering get_book_details tool');
       server.registerTool(
         'get_book_details',
-        'Get detailed information about a specific book by ID',
+        {
+          title: 'Get Book Details',
+          description: 'Get detailed information about a specific book by ID'
+        },
         {
           parameters: {
             type: 'object',
@@ -111,7 +117,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('Registering get_user_library tool');
       server.registerTool(
         'get_user_library',
-        'Get a list of books in the user\'s library',
+        {
+          title: 'Get User Library',
+          description: 'Get a list of books in the user\'s library'
+        },
         {
           parameters: {
             type: 'object',
