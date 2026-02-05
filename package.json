@@ -1,7 +1,7 @@
 {
   "name": "mcp-on-vercel",
   "version": "1.0.0",
-  "description": "",
+  "description": "Hardcover MCP server deployed on Vercel",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
     "start": "node dist/api/server.js",
     "dev": "tsx api/server.ts"
   },
-  "keywords": [],
+  "keywords": ["mcp", "hardcover", "vercel"],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -30,5 +30,8 @@
     "webpack": "^5.88.0",
     "tsx": "^4.0.0",
     "@types/graphql": "^14.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
