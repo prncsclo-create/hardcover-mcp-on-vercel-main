@@ -32,7 +32,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       console.log('Creating SSE transport');
-      const transport = new SSEServerTransport('/api/mcp', res);
+      const transport = new SSEServerTransport('/mcp', res);
       
       console.log('Creating MCP server');
       const server = new McpServer({

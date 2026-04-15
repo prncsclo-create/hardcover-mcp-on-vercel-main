@@ -1,5 +1,5 @@
 {
-  "rewrites": [{ "source": "/(.+)", "destination": "/api/server" }],
+  "rewrites": [{ "source": "/mcp", "destination": "/api/mcp" }],
   "functions": {
     "api/server.ts": {
       "maxDuration": 60
