@@ -36,8 +36,8 @@ These tools demonstrate basic functionality and API integration patterns. Replac
 
 ## Sample Client
 
-`script/test-client.mjs` contains a sample client to try invocations.
+`scripts/test-streamable-http-client.mjs` contains a sample client to try invocations.
 
 ```sh
-node scripts/test-client.mjs https://mcp-on-vercel.vercel.app
+node scripts/test-streamable-http-client.mjs https://mcp-on-vercel.vercel.app
 ```
